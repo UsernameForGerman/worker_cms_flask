@@ -114,7 +114,7 @@ def generate_new_id_for_model(model: tp.Type[tp.Union[models.Author, models.Deat
     with app.sqlite3.connect(app.DBNAME) as conn:
         cursor = conn.cursor()
         id = cursor.execute('SELECT id FROM {tablename} ORDER BY id DESC LIMIT 1;'.format(tablename=model.__tablename__)).fetchone()
-        return id[0] + 1
+        return id[0] + 1 if id else 0
 
 
 def insert_author(author: models.Author, death: tp.Optional[models.Death], countries: tp.List[str], works: tp.List[str]):

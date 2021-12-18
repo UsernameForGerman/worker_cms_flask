@@ -36,20 +36,20 @@ def authors_create():
         works = db.get_works()
         return flask.render_template('authors_add.html', countries=countries, works=works)
     input = dict(**flask.request.form)
-    if input['birth_date'] > dt.datetime.now():
+    if dt.datetime.fromisoformat(input['birth_date']) > dt.datetime.now():
         raise app.exceptions.BadRequest("Невалидная дата")
     death = input.pop('death', None)
     countries = flask.request.form.getlist('countries')
     works = flask.request.form.getlist('works')
-    input.pop('countries')
-    input.pop('works')
+    input.pop('countries', None)
+    input.pop('works', None)
 
     author = models.Author(
         id=db.generate_new_id_for_model(models.Author),
         **input
     )
     if death:
-        if input['birth_date'] >= death:
+        if dt.datetime.fromisoformat(input['birth_date']) >= death:
             raise app.exceptions.BadRequest("Невалидная дата")
         death = models.Death(
             id=author.id,
