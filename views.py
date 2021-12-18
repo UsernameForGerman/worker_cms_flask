@@ -83,8 +83,8 @@ def works_create():
     input = dict(**flask.request.form)
     countries = flask.request.form.getlist('countries')
     authors = flask.request.form.getlist('authors')
-    input.pop('countries')
-    input.pop('authors')
+    input.pop('countries', None)
+    input.pop('authors', None)
     if dt.datetime.fromisoformat(input['release_date']) > dt.datetime.now():
         raise app.exceptions.BadRequest("Не валидная дата")
     work = models.Work(
