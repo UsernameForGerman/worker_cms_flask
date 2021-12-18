@@ -1,0 +1,55 @@
+{% extends "bootstrap/base.html" %}
+{% block title %}{{ author.name }}{% endblock %}
+
+{% block content %}
+<h1>
+    Информация об авторе {{ author.name }}
+</h1>
+<p>Дата рождения: {{ author.birth_date }}</p>
+{% if death %}
+    <p>Дата смерти: {{ death.death }}</p>
+{% endif %}
+<h3>
+    Страны автора
+</h3>
+<table class="table table-bordered border-primary">
+  <thead>
+    <tr>
+        <th bgcolor="aqua"> Название </th>
+    </tr>
+  </thead>
+  <tbody>
+        {% for country in countries %}
+            <tr>
+                <th> {{ country.name }} </th>
+            </tr>
+        {% endfor %}
+  </tbody>
+</table>
+
+{% if works %}
+<h3>
+    Работы автора
+</h3>
+
+<table class="table table-bordered border-primary">
+  <thead>
+    <tr>
+        <th bgcolor="aqua"> Тип </th>
+        <th bgcolor="aqua"> Название </th>
+    </tr>
+  </thead>
+  <tbody>
+        {% for work in works %}
+            <tr>
+                <th> {{ work.type }} </th>
+                <th> <a href="/works/{{ work.id }}" target="_blank">{{ work.title }}</a> </th>
+            </tr>
+        {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+
+
+
+{% endblock %}

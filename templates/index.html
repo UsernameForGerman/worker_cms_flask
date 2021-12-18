@@ -1,0 +1,30 @@
+{% extends "bootstrap/base.html" %}
+{% block title %}Главная{% endblock %}
+{% block styles %}
+{{super()}}
+<style>
+  a:link {
+  color: blueviolet;
+  background-color: transparent;
+  text-decoration: none;
+}
+
+a:visited {
+  color: blueviolet;
+  background-color: transparent;
+  text-decoration: none;
+}
+
+a:hover {
+  color: blue;
+  background-color: transparent;
+  text-decoration: underline;
+}
+
+</style>
+{% endblock %}
+{% block content %}
+<h1>Справочник по авторам и работам от Германа Поляка</h1>
+<h2>Справочник по авторам <a href="/authors" target="_blank">тут</a>.</h2>
+<h2>Справочник по работам <a href="/works" target="_blank">тут</a>.</h2>
+{% endblock %}

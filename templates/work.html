@@ -1,0 +1,49 @@
+{% extends "bootstrap/base.html" %}
+{% block title %}{{ work.title }}{% endblock %}
+
+{% block content %}
+<h1>
+    Информация о работе {{ work.title }}
+</h1>
+<p>Дата создания: {{ work.release_date }}</p>
+<h3>
+    Страны
+</h3>
+<table class="table table-bordered border-primary">
+  <thead>
+    <tr>
+        <th bgcolor="aqua"> Название </th>
+    </tr>
+  </thead>
+  <tbody>
+        {% for country in countries %}
+            <tr>
+                <th> {{ country.name }} </th>
+            </tr>
+        {% endfor %}
+  </tbody>
+</table>
+
+<h3>
+    Авторы
+</h3>
+
+<table class="table table-bordered border-primary">
+  <thead>
+    <tr>
+        <th bgcolor="aqua"> Имя </th>
+    </tr>
+  </thead>
+  <tbody>
+        {% for author in authors %}
+            <tr>
+                <th> <a href="/authors/{{ author.id }}" target="_blank">{{ author.name }}</a> </th>
+            </tr>
+        {% endfor %}
+  </tbody>
+</table>
+
+
+
+
+{% endblock %}
