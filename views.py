@@ -29,6 +29,8 @@ def authors_id(id):
 
 @app.app.route('/authors/create', methods=['GET', 'POST'])
 def authors_create():
+    import models
+
     if flask.request.method == 'GET':
         countries = db.get_countries()
         works = db.get_works()
@@ -37,8 +39,11 @@ def authors_create():
     if input['birth_date'] > dt.datetime.now():
         raise app.exceptions.BadRequest("Невалидная дата")
     death = input.pop('death', None)
-    countries = input.pop('countries', [])
-    works = input.pop('works', [])
+    countries = flask.request.form.getlist('countries')
+    works = flask.request.form.getlist('works')
+    input.pop('countries')
+    input.pop('works')
+
     author = models.Author(
         id=db.generate_new_id_for_model(models.Author),
         **input
