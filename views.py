@@ -49,7 +49,7 @@ def authors_create():
         **input
     )
     if death:
-        if dt.datetime.fromisoformat(input['birth_date']) >= death:
+        if dt.datetime.fromisoformat(input['birth_date']) >= dt.datetime.fromisoformat(death):
             raise app.exceptions.BadRequest("Невалидная дата")
         death = models.Death(
             id=author.id,
@@ -78,7 +78,8 @@ def works_create():
     if flask.request.method == 'GET':
         countries = db.get_countries()
         authors = db.get_authors()
-        return flask.render_template('works_add.html', countries=countries, authors=authors)
+        types = db.get_types()
+        return flask.render_template('works_add.html', countries=countries, authors=authors, types=types)
 
     input = dict(**flask.request.form)
     countries = flask.request.form.getlist('countries')

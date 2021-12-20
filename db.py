@@ -11,7 +11,7 @@ def get_authors() -> tp.List[models.Author]:
         return [models.Author(*raw_author) for raw_author in raw_authors]
 
 
-def get_author_by_id(id: int) -> tp.Dict[str, tp.Union[models.Author, models.Death, tp.List[tp.Union[models.Country, models.Work]]]]:
+def get_author_by_id(id: int) -> tp.Dict[str, tp.Union[models.Author, models.Death, tp.List[tp.Union[models.Country, tp.Dict[str, tp.Union[models.Work, models.Type]]]]]]:
     with app.sqlite3.connect(app.DBNAME) as conn:
         cursor = conn.cursor()
         authors = cursor.execute("""
@@ -26,7 +26,9 @@ def get_author_by_id(id: int) -> tp.Dict[str, tp.Union[models.Author, models.Dea
             w.id,
             w.release_date,
             w.title,
-            w.type
+            w.type_id,
+            t.id,
+            t.name
         FROM author a
         LEFT JOIN death d
             ON d.id = a.id
@@ -38,8 +40,10 @@ def get_author_by_id(id: int) -> tp.Dict[str, tp.Union[models.Author, models.Dea
             ON atw.author_id = a.id
         LEFT JOIN work w
             ON w.id = atw.work_id
+        LEFT JOIN type t
+            ON w.type_id = t.id
         WHERE a.id = ?
-        ORDER BY w.type;
+        ORDER BY w.type_id;
         """, [id]).fetchall()
         if not authors:
             raise app.exceptions.NotFound()
@@ -50,7 +54,8 @@ def get_author_by_id(id: int) -> tp.Dict[str, tp.Union[models.Author, models.Dea
                 countries.append(country)
             work = models.Work(author[7], author[8], author[9], author[10]) if author[7] is not None else None
             if work and work not in works:
-                works.append(work)
+                type = models.Type(author[11], author[12])
+                works.append({'work': work, 'type': type})
         return {
             'author': models.Author(authors[0][0], authors[0][1], authors[0][2]),
             'death': models.Death(authors[0][3], authors[0][4]) if authors[0][3] is not None else None,
@@ -59,14 +64,17 @@ def get_author_by_id(id: int) -> tp.Dict[str, tp.Union[models.Author, models.Dea
         }
 
 
-def get_works() -> tp.List[models.Work]:
+def get_works() -> tp.List[tp.Dict[str, tp.Union[models.Work, models.Type]]]:
     with app.sqlite3.connect(app.DBNAME) as conn:
         cursor = conn.cursor()
-        raw_works = cursor.execute('SELECT * FROM work')
-        return [models.Work(*raw_work) for raw_work in raw_works]
+        sql = cursor.execute('SELECT * FROM work w INNER JOIN type t ON w.type_id = t.id;').fetchall()
+        return [{
+            'work': models.Work(work_type[0], work_type[1], work_type[2], work_type[3]),
+            'type': models.Type(work_type[4], work_type[5])
+        } for work_type in sql]
 
 
-def get_work_by_id(id: int) -> tp.Dict[str, tp.Union[models.Work, tp.List[tp.Union[models.Country, models.Author]]]]:
+def get_work_by_id(id: int) -> tp.Dict[str, tp.Union[models.Work, models.Type, tp.List[tp.Union[models.Country, models.Author]]]]:
     with app.sqlite3.connect(app.DBNAME) as conn:
         cursor = conn.cursor()
         works = cursor.execute("""
@@ -74,13 +82,17 @@ def get_work_by_id(id: int) -> tp.Dict[str, tp.Union[models.Work, tp.List[tp.Uni
             w.id, 
             w.release_date,
             w.title,
-            w.type,
+            w.type_id,
             c.id,
             c.name,
             a.id,
             a.name,
-            a.birth_date
+            a.birth_date,
+            t.id,
+            t.name
         FROM work w
+        INNER JOIN type t
+            ON w.type_id = t.id
         INNER JOIN country_to_work ctw
             ON ctw.work_id = w.id
         INNER JOIN country c
@@ -105,6 +117,7 @@ def get_work_by_id(id: int) -> tp.Dict[str, tp.Union[models.Work, tp.List[tp.Uni
             'work': models.Work(
                 works[0][0], works[0][1], works[0][2], works[0][3]
             ),
+            'type': models.Type(works[0][9], works[0][10]),
             'countries': countries,
             'authors': authors
         }
@@ -155,9 +168,9 @@ def insert_work(work: models.Work, countries: tp.List[str], authors: tp.List[str
         cursor = conn.cursor()
         cursor.execute(
             """
-            INSERT INTO work (id, title, release_date, type)
+            INSERT INTO work (id, title, release_date, type_id)
             VALUES (?, ?, ?, ?);
-            """, [work.id, work.title, work.release_date, work.type]
+            """, [work.id, work.title, work.release_date, work.type_id]
         )
         cursor.executemany(
             """
@@ -182,5 +195,15 @@ def get_countries() -> tp.List[models.Country]:
         return [models.Country(*country) for country in cursor.execute(
             """
             SELECT * FROM country;
+            """
+        )]
+
+
+def get_types() -> tp.List[models.Type]:
+    with app.sqlite3.connect(app.DBNAME) as conn:
+        cursor = conn.cursor()
+        return [models.Type(*type) for type in cursor.execute(
+            """
+            SELECT * FROM type;
             """
         )]

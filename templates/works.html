@@ -1,5 +1,5 @@
 {% extends "bootstrap/base.html" %}
-{% block title %}Авторы{% endblock %}
+{% block title %}Работы{% endblock %}
 {% block styles %}
 {{super()}}
 <style>
@@ -20,12 +20,14 @@
   <thead class="thead-dark">
     <tr>
         <th bgcolor="aqua"> Название </th>
+        <th bgcolor="aqua"> Тип </th>
     </tr>
   </thead>
   <tbody>
   {% for work in works %}
     <tr>
-        <td> <a href="/works/{{ work.id }}" target="_blank">{{ work.title }}</a> </td>
+        <td> <a href="/works/{{ work.work.id }}" target="_blank">{{ work.work.title }}</a> </td>
+        <td> {{ work.type.name }} </td>
     </tr>
   {% endfor %}
   </tbody>

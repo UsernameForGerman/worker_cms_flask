@@ -42,8 +42,8 @@
   <tbody>
         {% for work in works %}
             <tr>
-                <th> {{ work.type }} </th>
-                <th> <a href="/works/{{ work.id }}" target="_blank">{{ work.title }}</a> </th>
+                <th> {{ work.type.name }} </th>
+                <th> <a href="/works/{{ work.work.id }}" target="_blank">{{ work.work.title }}</a> </th>
             </tr>
         {% endfor %}
   </tbody>

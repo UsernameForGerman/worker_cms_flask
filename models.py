@@ -32,7 +32,14 @@ class Work:
     id: int
     release_date: str
     title: str
-    type: str
+    type_id: str
+
+
+@dc.dataclass
+class Type:
+    __tablename__ = 'type'
+    id: int
+    name: str
 
 
 @dc.dataclass

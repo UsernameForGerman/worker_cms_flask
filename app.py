@@ -18,30 +18,36 @@ def prepare_db():
         """
         CREATE TABLE IF NOT EXISTS author(
             id INTEGER UNIQUE NOT NULL PRIMARY KEY,
-            name TEXT,
-            birth_date TEXT
+            name TEXT NOT NULL,
+            birth_date TEXT NOT NULL
         );
         """,
         """
         CREATE TABLE IF NOT EXISTS death(
             id INTEGER UNIQUE NOT NULL PRIMARY KEY,
-            death DATE,
+            death TEXT NOT NULL,
             FOREIGN KEY (id) REFERENCES author(id) ON DELETE CASCADE
-            ON DELETE CASCADE
         );
         """,
         """
         CREATE TABLE IF NOT EXISTS country(
             id INTEGER UNIQUE NOT NULL PRIMARY KEY,
-            name TEXT
+            name TEXT NOT NULL
+        );
+        """,
+        """
+        CREATE TABLE IF NOT EXISTS type(
+            id INTEGER UNIQUE NOT NULL PRIMARY KEY,
+            name TEXT NOT NULL
         );
         """,
         """
         CREATE TABLE IF NOT EXISTS work(
             id INTEGER UNIQUE NOT NULL PRIMARY KEY,
-            release_date TEXT,
-            title TEXT,
-            type TEXT
+            release_date TEXT NOT NULL,
+            title TEXT NOT NULL,
+            type_id INTEGER NOT NULL,
+            FOREIGN KEY (type_id) REFERENCES type(id) ON DELETE CASCADE
         );
         """,
         """
@@ -91,6 +97,10 @@ def prepare_db():
         """
         CREATE INDEX IF NOT EXISTS author_to_work_work_id_idx
         ON author_to_work(work_id);
+        """,
+        """
+        CREATE INDEX IF NOT EXISTS work_type_id_idx
+        ON work(type_id);
         """
     ]
     for statement in statements:
